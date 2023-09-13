@@ -41,12 +41,23 @@ um_data2020 <- ERA5 %>%
   filter(year == 2020) %>%
   glimpse()
 
+
+um_data2020 <- um_data2020 %>% 
+  mutate(Tmean_tbase = Temp - 5) %>% 
+  glimpse()
+
+
+um_data2020 <- um_data2020 %>%
+  mutate(Tmean_tbase = ifelse(Tmean_tbase < 0, 0, Tmean_tbase)) %>%
+  glimpse()
+
+
 sum_data2020_1 <- um_data2020 %>%
   arrange(Category, First_10_Characters) %>%
   group_by(Category) %>%
-  mutate(GDD = cumsum(GDD)) %>%
+  mutate(GDD = cumsum(Tmean_tbase)) %>%
   ungroup() %>% 
-  glimpse()
+  view()
 
 sum_data2020_2 <- sum_data2020_1 %>%
   mutate(
@@ -70,19 +81,29 @@ um_data2021 <- ERA5 %>%
   filter(year == 2021) %>%
   glimpse()
 
+
+um_data2021 <- um_data2021 %>% 
+  mutate(Tmean_tbase = Temp - 5) %>% 
+  glimpse()
+
+
+um_data2021 <- um_data2021 %>%
+  mutate(Tmean_tbase = ifelse(Tmean_tbase < 0, 0, Tmean_tbase)) %>%
+  glimpse()
+
+
 sum_data2021_1 <- um_data2021 %>%
   arrange(Category, First_10_Characters) %>%
   group_by(Category) %>%
-  mutate(GDD = cumsum(GDD)) %>%
+  mutate(GDD = cumsum(Tmean_tbase)) %>%
   ungroup() %>% 
-  glimpse()
+  view()
 
 sum_data2021_2 <- sum_data2021_1 %>%
   mutate(
     DOY = as.numeric(First_10_Characters - as.Date(paste0(year(First_10_Characters), "-01-01")) + 1)
   ) %>% 
   glimpse()
-
 
 
 #2022
@@ -100,21 +121,29 @@ um_data2022 <- ERA5 %>%
   filter(year == 2022) %>%
   glimpse()
 
+
+um_data2022 <- um_data2022 %>% 
+  mutate(Tmean_tbase = Temp - 5) %>% 
+  glimpse()
+
+
+um_data2022 <- um_data2022 %>%
+  mutate(Tmean_tbase = ifelse(Tmean_tbase < 0, 0, Tmean_tbase)) %>%
+  glimpse()
+
+
 sum_data2022_1 <- um_data2022 %>%
   arrange(Category, First_10_Characters) %>%
   group_by(Category) %>%
-  mutate(GDD = cumsum(GDD)) %>%
+  mutate(GDD = cumsum(Tmean_tbase)) %>%
   ungroup() %>% 
-  glimpse()
+  view()
 
-sum_data2022_2 <- sum_data2022_1 %>%
+sum_data2022_2 <- sum_data202_1 %>%
   mutate(
     DOY = as.numeric(First_10_Characters - as.Date(paste0(year(First_10_Characters), "-01-01")) + 1)
   ) %>% 
   glimpse()
-
-
-sum_data2021_1 %>% glimpse()
 
 
 ## Bindowanie tabelek
@@ -133,7 +162,7 @@ combined_data1 %>% glimpse()
 
 ## nowa tabelka z pokosem 
 
-pokos1 <- read.csv("/Users/maciejjurzyk/Downloads/Arkusz kalkulacyjny bez tytułu - Arkusz1 (2).csv")
+pokos1 <- read.csv("/Users/maciejjurzyk/Downloads/pokos1.csv")
 
 pokos1 %>% glimpse()
 
@@ -150,11 +179,64 @@ pokos_combined <- pokos2 %>%
 
 pokos_combined %>% glimpse()
 
-pokos_combined1 <- pokos_combined %>% select(-First_10_Characters, -New_Date.x, -Category, -ID, -Latitude, -Longitude, -New_Date.y, -year)
+pokos_combined1 <- pokos_combined %>% select(-First_10_Characters, -New_Date.x, -Category, -ID, -Latitude, -Longitude, -New_Date.y, -year, -Tmean_tbase)
 
 
 pokos_combined1 %>% view()
 
-write.csv2(pokos_combined1, file = "pokos3_MJ_automat.csv")
+write.csv2(pokos_combined1, file = "pokos1_poprawiony_MJ.csv")
+
+#Pokos2 ----
+
+pokos1 <- read.csv("/Users/maciejjurzyk/Downloads/pokos2.csv")
+
+pokos1 %>% glimpse()
+
+pokos2 <- pokos1 %>%
+  mutate(
+    First_10_Characters = as.Date(DATA, format = "%m/%d/%Y"),
+    New_Date = as.POSIXct(First_10_Characters)
+  ) %>%
+  select(-DATA) %>%
+  glimpse()
+
+pokos_combined <- pokos2 %>%
+  left_join(combined_data1, by = c("First_10_Characters", "PUNKT"))
+
+pokos_combined %>% glimpse()
+
+pokos_combined1 <- pokos_combined %>% select(-First_10_Characters, -New_Date.x, -Category, -ID, -Latitude, -Longitude, -New_Date.y, -year, -Tmean_tbase)
+
+
+pokos_combined1 %>% view()
+
+write.csv2(pokos_combined1, file = "pokos2_poprawiony_MJ.csv")
+
+# pokos3 ----
+
+pokos1 <- read.csv("/Users/maciejjurzyk/Downloads/pokos3.csv")
+
+pokos1 %>% glimpse()
+
+pokos2 <- pokos1 %>%
+  mutate(
+    First_10_Characters = as.Date(DATA, format = "%m/%d/%Y"),
+    New_Date = as.POSIXct(First_10_Characters)
+  ) %>%
+  select(-DATA) %>%
+  glimpse()
+
+pokos_combined <- pokos2 %>%
+  left_join(combined_data1, by = c("First_10_Characters", "PUNKT"))
+
+pokos_combined %>% glimpse()
+
+pokos_combined1 <- pokos_combined %>% select(-First_10_Characters, -New_Date.x, -Category, -ID, -Latitude, -Longitude, -New_Date.y, -year, -Tmean_tbase)
+
+
+pokos_combined1 %>% view()
+
+write.csv2(pokos_combined1, file = "pokos3_poprawiony_MJ.csv")
+
 
 
